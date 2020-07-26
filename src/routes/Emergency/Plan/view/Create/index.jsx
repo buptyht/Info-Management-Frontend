@@ -4,6 +4,7 @@ import { Form, Input, Select, Button, message, Upload, Icon } from 'antd';
 import { SELECT_EMERGENCY_PLAN_LEVEL } from '../../config';
 import axios from 'axios';
 import './index.styl'
+import { fromJS } from 'immutable';
 
 var value = window.sessionStorage.getItem("user_id")
 class EmergencyNew extends Component {
@@ -43,66 +44,108 @@ class EmergencyNew extends Component {
       history,
       match: { params: { id } },
     } = this.props
-    console.log(this.props)
-    const { getFieldValue } = form;
-    const values = form.getFieldsValue()
+    // console.log(this)
+    // console.log(id)
+    // console.log(this.props)
+    // console.log(this.state)
+    // const { getFieldValue } = form;
+    // const values = form.getFieldsValue()
     var path = this.state.url
     var attachPath = this.state.attachUrl
     var str1 = path.replace('.', '/');
     var str2 = attachPath.replace('.', '/');
-    if (!getFieldValue('level')) {
-      message.error('请选择预案级别')
-    }
-    if (!getFieldValue('name')) {
-      message.error('请输入预案名称')
-    }
-    if (!getFieldValue('category')) {
-      message.error('请输入预案类别')
-    }
-    if (!getFieldValue('associated_event_type')) {
-      message.error('请输入预案关联事件类型')
-    }
-    if (!getFieldValue('associated_event_type')) {
-      message.error('请输入编制单位/部门')
-    }
-    if (!getFieldValue('release_number')) {
-      message.error('请输入发布文号')
-    }
-    if (!getFieldValue('issued')) {
-      message.error('请输入发布单位')
-    }
-    if (!getFieldValue('signer')) {
-      message.error('请输入签发人')
-    }
-    values.release_date = new Date()
-    if (id) {
-      values.emergency_id = id
-      values.content = str1
-      values.file = str2
-      axios.put('/api/v1/info/emergency?user_id=' + value, values)
-        .then(function (response) {
-          if (response.status === 200) {
-            message.info('编辑成功')
-            history.push('/emergency/plan')
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-      console.log(this.state.fileList)
-    } else {
-      values.content = str1
-      axios.post('/api/v1/info/emergency?user_id=' + value, values)
-        .then(function (response) {
-          if (response.status === 200) {
-            message.info('创建成功')
-            history.push('/emergency/plan')
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
+    // if (!getFieldValue('level')) {
+    //   message.error('请选择预案级别')
+    // }
+    // else if (!getFieldValue('name')) {
+    //   message.error('请输入预案名称')
+    // }
+    // else if (!getFieldValue('category')) {
+    //   message.error('请输入预案类别')
+    // }
+    // else if (!getFieldValue('associated_event_type')) {
+    //   message.error('请输入预案关联事件类型')
+    // }
+    // else if (!getFieldValue('associated_event_type')) {
+    //   message.error('请输入编制单位/部门')
+    // }
+    // else if (!getFieldValue('release_number')) {
+    //   message.error('请输入发布文号')
+    // }
+    // else if (!getFieldValue('issued')) {
+    //   message.error('请输入发布单位')
+    // }
+    // else if (!getFieldValue('signer')) {
+    //   message.error('请输入签发人')
+    // }
+    // else{
+    //   values.release_date = new Date()
+    //   if (id) {
+    //     values.emergency_id = id
+    //     values.content = str1
+    //     values.file = str2
+    //     axios.put('/api/v1/info/emergency?user_id=' + value, values)
+    //       .then(function (response) {
+    //         if (response.status === 200) {
+    //           message.info('编辑成功')
+    //           history.push('/emergency/plan')
+    //         }
+    //       })
+    //       .catch(function (error) {
+    //         console.log(error);
+    //       });
+    //     console.log(this.state.fileList)
+    //   } else {
+    //     values.content = str1
+    //     axios.post('/api/v1/info/emergency?user_id=' + value, values)
+    //       .then(function (response) {
+    //         if (response.status === 200) {
+    //           message.info('创建成功')
+    //           history.push('/emergency/plan')
+    //         }
+    //       })
+    //       .catch(function (error) {
+    //         console.log(error);
+    //       });
+    //   }
+    // }
+
+    form.validateFields((err,values)=>{
+      if(err){
+        console.log(err)
+      }
+      else{
+        values.release_date = new Date()
+        if (id) {
+          values.emergency_id = id
+          values.content = str1
+          values.file = str2
+          axios.put('/api/v1/info/emergency?user_id=' + value, values)
+            .then(function (response) {
+              if (response.status === 200) {
+                message.info('编辑成功')
+                history.push('/emergency/plan')
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+          console.log(this.state.fileList)
+        } else {
+          values.content = str1
+          axios.post('/api/v1/info/emergency?user_id=' + value, values)
+            .then(function (response) {
+              if (response.status === 200) {
+                message.info('创建成功')
+                history.push('/emergency/plan')
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        }
+      }
+    })
   }
 
   //文件下载
@@ -282,7 +325,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.level,
                 rules: [{
                   required: true,
-                  message: "请选择预案级别",
+                  message: "请选择预案级别"
                 }]
               })(
                 <Select placeholder="请选择预案级别"
@@ -307,7 +350,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.name,
                 rules: [{
                   required: true,
-                  message: "请输入预案名称",
+                  message: "请输入预案名称"
                 }]
               })(
                 <Input placeholder="请输入预案名称" />
@@ -322,7 +365,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.category,
                 rules: [{
                   required: true,
-                  message: "请输入预案类别",
+                  message: "请输入预案类别"
                 }]
               })(
                 <Input placeholder="请输入预案类别" />
@@ -336,7 +379,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.associated_event_type,
                 rules: [{
                   required: true,
-                  message: "请输入预案关联事件类型",
+                  message: "请输入预案关联事件类型"
                 }]
               })(
                 <Input placeholder="请输入预案关联事件类型" />
@@ -349,8 +392,8 @@ class EmergencyNew extends Component {
               {getFieldDecorator('content', {
                 initialValue: id && planDetail.content,
                 rules: [{
-                  //   required:true,
-                  message: "请输入预案内容",
+                  required:true,
+                  message: "请输入预案内容"
                 }]
               })(
                 <div>
@@ -384,7 +427,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.department,
                 rules: [{
                   required: true,
-                  message: "请输入编制单位/部门",
+                  message: "请输入编制单位/部门"
                 }]
               })(
                 <Input placeholder="请输入编制单位/部门" />
@@ -398,7 +441,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.release_number,
                 rules: [{
                   required: true,
-                  message: "请输入发布文号",
+                  message: "请输入发布文号"
                 }]
               })(
                 <Input placeholder="请输入发布文号" />
@@ -412,7 +455,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.issued,
                 rules: [{
                   required: true,
-                  message: "请输入发布单位",
+                  message: "请输入发布单位"
                 }]
               })(
                 <Input placeholder="请输入发布单位" />
@@ -426,7 +469,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.signer,
                 rules: [{
                   required: true,
-                  message: "请输入签发人",
+                  message: "请输入签发人"
                 }]
               })(
                 <Input placeholder="请输入签发人" />
@@ -440,7 +483,7 @@ class EmergencyNew extends Component {
                 initialValue: id && planDetail.file,
                 rules: [{
                   //  required:true,
-                  message: "请输入相关附件",
+                  message: "请输入相关附件"
                 }]
               })(
                 <div>
