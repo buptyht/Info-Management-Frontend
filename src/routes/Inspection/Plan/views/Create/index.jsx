@@ -93,57 +93,64 @@ class PlanNew extends Component {
     } = this.props
     const { getFieldValue } = form;
     const { planDetail } = this.state
-    const values = form.getFieldsValue()
-    if (!getFieldValue('inspection_person')) {
-      message.error('请输入巡检人员')
-    }
-    if (!getFieldValue('inspection_date')) {
-      message.error('请输入巡检日期')
-    }
-    if (!getFieldValue('content')) {
-      message.error('请输入描述')
-    }
-    if (!getFieldValue('path')) {
-      message.error('请输入巡检路线')
-    }
-    values.create_date = new Date()
-    console.log(values.create_date)
-    values.status = planDetail.status
-    values.inspection_date = new Date(getFieldValue('inspection_date'))
-    // values.inspection_date=getFieldValue('inspection_date')._d
-    console.log(values.inspection_date)
+    // const values = form.getFieldsValue()
+    // if (!getFieldValue('inspection_person')) {
+    //   message.error('请输入巡检人员')
+    // }
+    // if (!getFieldValue('inspection_date')) {
+    //   message.error('请输入巡检日期')
+    // }
+    // if (!getFieldValue('content')) {
+    //   message.error('请输入描述')
+    // }
+    // if (!getFieldValue('path')) {
+    //   message.error('请输入巡检路线')
+    // }
+    form.validateFields((err,values)=>{
+      if(err){
+        console.log(err)
+      }else{
+        values.create_date = new Date()
+        console.log(values.create_date)
+        values.status = planDetail.status
+        values.inspection_date = new Date(getFieldValue('inspection_date'))
+        // values.inspection_date=getFieldValue('inspection_date')._d
+        console.log(values.inspection_date)
+  
+        if (id) {
+          values.id = id
+          values.number = planDetail.number
+          axios.put('/api/v1/info/plan?user_id=' + user_id, values)
+            .then(function (response) {
+              if (response.status === 200) {
+                message.info('编辑成功')
+                history.push('/inspection/plan')
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        } else {
+          values.status = '未完成'
+          axios.post('/api/v1/info/plan?user_id=' + user_id, values)
+            .then(function (response) {
+              if (response.status === 200) {
+                message.info('创建成功')
+                history.push('/inspection/plan')
+                // axios.post('/api/v1/info/sendGeneralMessage', values)
+                // .then(function(response){
+                //   message.info("邮件已发送")
+                // }
+                // )
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+        }      
+      }
+    })
 
-    if (id) {
-      values.id = id
-      values.number = planDetail.number
-      axios.put('/api/v1/info/plan?user_id=' + user_id, values)
-        .then(function (response) {
-          if (response.status === 200) {
-            message.info('编辑成功')
-            history.push('/inspection/plan')
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    } else {
-      values.status = '未完成'
-      axios.post('/api/v1/info/plan?user_id=' + user_id, values)
-        .then(function (response) {
-          if (response.status === 200) {
-            message.info('创建成功')
-            history.push('/inspection/plan')
-            // axios.post('/api/v1/info/sendGeneralMessage', values)
-            // .then(function(response){
-            //   message.info("邮件已发送")
-            // }
-            // )
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
 
   }
 
